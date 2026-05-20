@@ -47,41 +47,8 @@ already held in the idempotency cache  dropped immediately.
 ---
 
 ## How It Works?
-
-```mermaid
-graph TD
-    %% Nodes Defintion
-    subgraph Offline Environment
-        Sender[Sender Device <br/> Offline]
-        Hop1[Stranger Phone A <br/> Offline Mesh Node]
-        Hop2[Stranger Phone B <br/> Offline Mesh Node]
-    end
-
-    subgraph Internet Edge
-        Bridge[Bridge Device <br/> Connected to 4G/Wi-Fi]
-    end
-
-    subgraph Central Banking System
-        API[API Gateway / Ingestion Controller]
-        Idem[Idempotency Gate <br/> ConcurrentHashMap / Redis]
-        Crypto[Hybrid Crypto Service <br/> RSA Private Key]
-        Settle[Settlement Ledger Service]
-        DB[(H2 Database <br/> Accounts & Transactions)]
-    end
-
-    %% Flow Connections
-    Sender -- 1. Encrypts JSON & signs --> Sender
-    Sender -- 2. BLE Gossip Hop --> Hop1
-    Hop1 -- 3. BLE Gossip Hop --> Hop2
-    Hop2 -- 4. BLE Gossip Hop --> Bridge
-    Bridge -- 5. HTTP POST /api/bridge/ingest --> API
-    API --> Idem
-    Idem -- 6. Claim Hash Uniqueness --> Crypto
-    Crypto -- 7. Decrypt & Verify Freshness --> Settle
-    Settle -- 8. Atomic Debit/Credit --> DB
-
-```
-
+![How It Works?](screenshots/diagram.png)
+   
 ---
 
 ## Tech Stack
