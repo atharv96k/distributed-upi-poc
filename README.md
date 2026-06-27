@@ -21,9 +21,7 @@ them reading or modifying it?**
 
 Hybrid RSA-OAEP + AES-256-GCM encryption. The payment is 
 encrypted on the sender's device before entering the mesh. 
-Intermediate phones carry an opaque ciphertext blob  
-completely unreadable. One flipped bit in transit breaks 
-the GCM authentication tag and the server rejects the packet.
+Intermediate phones carry an opaque ciphertext blob completely unreadable. One flipped bit in transit breaks the GCM authentication tag and the server rejects the packet.
 
 **Problem 2:  Same packet arrives from 5 phones at once. 
 How do you prevent double-charging?**
