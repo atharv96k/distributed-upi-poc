@@ -6,6 +6,7 @@ import com.demo.upimesh.model.Account;
 import com.demo.upimesh.model.AccountRepository;
 import com.demo.upimesh.model.MeshPacket;
 import com.demo.upimesh.model.PaymentInstruction;
+import com.demo.upimesh.model.TransactionRepository;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import java.util.UUID;
  * Helper service that:
  *   - seeds demo accounts on startup
  *   - simulates "sender phone creates an encrypted packet" flow
+ *   - resets all demo state (accounts, ledger, mesh simulator)
  */
 @Service
 public class DemoService {
@@ -28,18 +30,36 @@ public class DemoService {
     private static final Logger log = LoggerFactory.getLogger(DemoService.class);
 
     @Autowired private AccountRepository accounts;
+    @Autowired private TransactionRepository transactions;
+    @Autowired private MeshSimulatorService simulator;
     @Autowired private HybridCryptoService crypto;
     @Autowired private ServerKeyHolder serverKey;
 
     @PostConstruct
     public void seedAccounts() {
         if (accounts.count() == 0) {
-            accounts.save(new Account("atharv@demo", "Atharv",   new BigDecimal("5000.00")));
-            accounts.save(new Account("viraj@demo",   "Viraj",     new BigDecimal("1000.00")));
-            accounts.save(new Account("chirag@demo", "Chirag",   new BigDecimal("2500.00")));
-            accounts.save(new Account("dave@demo",  "Dave",    new BigDecimal("500.00")));
+            seedDefaultAccounts();
             log.info("Seeded 4 demo accounts");
         }
+    }
+
+    /**
+     * Resets bank balances to defaults, wipes transactions,
+     * and resets simulated mesh node buffers.
+     */
+    public void resetDemo() {
+        transactions.deleteAll();
+        accounts.deleteAll();
+        seedDefaultAccounts();
+        simulator.resetMesh();
+        log.info("Demo state reset completed");
+    }
+
+    private void seedDefaultAccounts() {
+        accounts.save(new Account("atharv@demo", "Atharv",  new BigDecimal("5000.00")));
+        accounts.save(new Account("viraj@demo",  "Viraj",   new BigDecimal("1000.00")));
+        accounts.save(new Account("chirag@demo", "Chirag",  new BigDecimal("2500.00")));
+        accounts.save(new Account("dave@demo",   "Dave",    new BigDecimal("500.00")));
     }
 
     /**
@@ -47,10 +67,6 @@ public class DemoService {
      *   1. Build a PaymentInstruction with a fresh nonce + signedAt timestamp.
      *   2. Encrypt with the server's public key (hybrid RSA+AES).
      *   3. Wrap in a MeshPacket with TTL.
-     *
-     * In a real Android app, this exact code (minus the server-side reference)
-     * would run on the phone. The phone would have already cached the server's
-     * public key during a previous online session.
      */
     public MeshPacket createPacket(String senderVpa, String receiverVpa,
                                    BigDecimal amount, String pin, int ttl) throws Exception {
