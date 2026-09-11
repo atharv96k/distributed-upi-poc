@@ -77,6 +77,35 @@
             letter-spacing: 1px;
         }
 
+        /* GitHub docs link */
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 6px;
+            padding: 6px 12px;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+        .github-link:hover {
+            color: var(--accent);
+            border-color: rgba(0,212,255,0.4);
+            background: rgba(0,212,255,0.06);
+        }
+        .github-link svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
         /* Cards */
         .card {
             background: var(--surface);
@@ -349,6 +378,12 @@
                 Send money in a basement with zero internet. Encrypted packets gossip phone-to-phone until a 4G node reaches the backend.
             </div>
         </div>
+        <a class="github-link" href="https://github.com/atharv96k/distributed-upi-poc" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            Docs
+        </a>
     </div>
 
     <!-- Controls -->
@@ -358,16 +393,16 @@
         <div class="step-row">
             <div class="step-num">1</div>
             <div class="step-label">Compose Payment</div>
-            <select id="senderVpa">
-                <option>alice@demo</option>
-                <option>bob@demo</option>
-                <option>carol@demo</option>
+            <select id="senderVpa" onchange="syncReceiverOptions()">
+                <option>atharv@demo</option>
+                <option>viraj@demo</option>
+                <option>chirag@demo</option>
             </select>
             <span class="arrow">→</span>
             <select id="receiverVpa">
-                <option>bob@demo</option>
-                <option>carol@demo</option>
-                <option>alice@demo</option>
+                <option>viraj@demo</option>
+                <option>chirag@demo</option>
+                <option>atharv@demo</option>
                 <option>dave@demo</option>
             </select>
             ₹<input type="number" id="amount" value="500" style="width: 90px; margin-left: 6px;">
@@ -449,6 +484,29 @@ function log(msg) {
     el.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg + '\n' + el.textContent;
 }
 
+function syncReceiverOptions() {
+    const senderSelect = document.getElementById('senderVpa');
+    const receiverSelect = document.getElementById('receiverVpa');
+    const chosenSender = senderSelect.value;
+
+    let selectedWasDisabled = false;
+
+    Array.from(receiverSelect.options).forEach(opt => {
+        if (opt.value === chosenSender) {
+            opt.disabled = true;
+            if (opt.selected) selectedWasDisabled = true;
+        } else {
+            opt.disabled = false;
+        }
+    });
+
+    // If the receiver was on the option we just disabled, move it to the first valid option
+    if (selectedWasDisabled) {
+        const firstValid = Array.from(receiverSelect.options).find(opt => !opt.disabled);
+        if (firstValid) receiverSelect.value = firstValid.value;
+    }
+}
+
 async function refresh() {
     const m = await fetch('/api/mesh/state').then(r => r.json());
     const devicesDiv = document.getElementById('devices');
@@ -498,7 +556,7 @@ async function sendPacket() {
         amount: parseFloat(document.getElementById('amount').value),
         pin: document.getElementById('pin').value,
         ttl: 5,
-        startDevice: 'phone-alice'
+        startDevice: 'phone-atharv'
     };
     const r = await fetch('/api/demo/send', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -531,6 +589,7 @@ async function resetMesh() {
     refresh();
 }
 
+syncReceiverOptions();
 refresh();
 setInterval(refresh, 3000);
 </script>
