@@ -1,6 +1,6 @@
 
 <div align="center">
-  <img src="screenshots/logo.png" alt="UPI Mesh — Proof of Concept" width="500" />
+  <img src="screenshots/logo.png" alt="UPI Mesh — Proof of Concept" width="600" />
 
   <p><strong>Exploring Offline Payments Through Device Mesh Networks</strong></p>
 
