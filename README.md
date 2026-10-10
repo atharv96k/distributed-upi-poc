@@ -2,8 +2,6 @@
 <div align="center">
   <img src="screenshots/logo.png" alt="UPI Mesh — Proof of Concept" width="600" />
 
-  <p><strong>Exploring Offline Payments Through Device Mesh Networks</strong></p>
-
   <p>
     An experimental proof of concept for encrypted payment propagation, duplicate detection, and deferred settlement when connectivity becomes available.
   </p>
