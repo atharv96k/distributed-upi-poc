@@ -1,6 +1,6 @@
 
 <div align="center">
-  <img src="screenshots/logo.png" alt="UPI Mesh — Proof of Concept" width="600" />
+  <img src="screenshots/logo1.png" alt="UPI Mesh — Proof of Concept" width="600" />
 
   <p>
     An experimental proof of concept for encrypted payment propagation, duplicate detection, and deferred settlement when connectivity becomes available.
